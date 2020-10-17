@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Times+New+Roman:300,300italic,400,400italic,700,700italic|Crimson+Text:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14.0/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"kingzy-chen.github.io","root":"/","scheme":"Gemini","version":"8.0.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="实验目标用编程语言实现以下算法：1. 用 高斯 (Gauss) 消元法 求 n 阶线性方程组的解; 2. 用 列主元高斯 (Gauss) 消元法 求 n 阶线性方程组的解; 3. 用 列主元 LU 直接分解法 求 n 阶线性方程组的解; 4. 用 Jacobi 迭代法 求 n 阶线性方程组的解; 5. 用 Gauss-Seidel 迭代法 求 n 阶线性方程组的解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【数值分析课程实验-03】线性代数方程组的数值解法">
+<meta property="og:url" content="http://kingzy-chen.github.io/2020/10/17/Numerical-Analysis-03/index.html">
+<meta property="og:site_name" content="Kingzy&#39;s Blog">
+<meta property="og:description" content="实验目标用编程语言实现以下算法：1. 用 高斯 (Gauss) 消元法 求 n 阶线性方程组的解; 2. 用 列主元高斯 (Gauss) 消元法 求 n 阶线性方程组的解; 3. 用 列主元 LU 直接分解法 求 n 阶线性方程组的解; 4. 用 Jacobi 迭代法 求 n 阶线性方程组的解; 5. 用 Gauss-Seidel 迭代法 求 n 阶线性方程组的解。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://kingzy-chen.github.io/2020/10/17/Numerical-Analysis-03/壁纸.jpg">
+<meta property="article:published_time" content="2020-10-17T04:09:03.000Z">
+<meta property="article:modified_time" content="2020-10-17T04:36:42.869Z">
+<meta property="article:author" content="Kingzy">
+<meta property="article:tag" content="数值分析">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="高斯消元法">
+<meta property="article:tag" content="Jacobi 迭代法">
+<meta property="article:tag" content="Gauss-Seidei 迭代法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://kingzy-chen.github.io/2020/10/17/Numerical-Analysis-03/壁纸.jpg">
+
+
+<link rel="canonical" href="http://kingzy-chen.github.io/2020/10/17/Numerical-Analysis-03/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>【数值分析课程实验-03】线性代数方程组的数值解法 | Kingzy's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+
+  <script type="text/javascript" src="/js/src/click-love.js"></script>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <script src="/live2d-widget/autoload.js"></script>
+
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Kingzy's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Personal Technology Website</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%9B%AE%E6%A0%87"><span class="nav-number">1.</span> <span class="nav-text">实验目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80%E4%B8%8E%E6%89%A9%E5%B1%95%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">编程语言与扩展库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">实现代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E6%B6%88%E5%85%83%E6%B3%95-Gauss"><span class="nav-number">3.1.</span> <span class="nav-text">高斯消元法 (Gauss)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%97%E4%B8%BB%E5%85%83%E9%AB%98%E6%96%AF%E6%B6%88%E5%85%83%E6%B3%95%EF%BC%88Gauss%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">列主元高斯消元法（Gauss）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%97%E4%B8%BB%E5%85%83-LU-%E7%9B%B4%E6%8E%A5%E5%88%86%E8%A7%A3%E6%B3%95"><span class="nav-number">3.3.</span> <span class="nav-text">列主元 LU 直接分解法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Jacobi-%E8%BF%AD%E4%BB%A3%E6%B3%95"><span class="nav-number">3.4.</span> <span class="nav-text">Jacobi 迭代法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Gauss-Seidel-%E8%BF%AD%E4%BB%A3%E6%B3%95"><span class="nav-number">3.5.</span> <span class="nav-text">Gauss-Seidel 迭代法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E6%9C%80%E5%90%8E"><span class="nav-number">4.</span> <span class="nav-text">写在最后</span></a></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kingzy"
+      src="/images/Kingzy-Head.jpg">
+  <p class="site-author-name" itemprop="name">Kingzy</p>
+  <div class="site-description" itemprop="description">Fake it till you Make it.</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="/images/Kingzy-QQ.jpg" title="QQ → &#x2F;images&#x2F;Kingzy-QQ.jpg"><i class="fab fa-qq fa-fw"></i>QQ</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/images/Kingzy-WeChat.jpg" title="WeChat → &#x2F;images&#x2F;Kingzy-WeChat.jpg"><i class="fab fa-weixin fa-fw"></i>WeChat</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://blog.csdn.net/weixin_43381409" title="CSDN → https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_43381409" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>CSDN</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://github.com/Kingzy-Chen" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Kingzy-Chen" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+
+    <div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=300 height=350 src="//music.163.com/outchain/player?type=0&id=5235970149&auto=0&height=430"></iframe>
+    </div>
+
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kingzy-chen.github.io/2020/10/17/Numerical-Analysis-03/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Kingzy-Head.jpg">
+      <meta itemprop="name" content="Kingzy">
+      <meta itemprop="description" content="Fake it till you Make it.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kingzy's Blog">
+    </span>
+
+    
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【数值分析课程实验-03】线性代数方程组的数值解法
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2020-10-17 12:09:03 / 修改时间：12:36:42" itemprop="dateCreated datePublished" datetime="2020-10-17T12:09:03+08:00">2020-10-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90/" itemprop="url" rel="index"><span itemprop="name">数值分析</span></a>
+        </span>
+    </span>
+
+  
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <img src="/2020/10/17/Numerical-Analysis-03/壁纸.jpg" style="zoom: 70%;">
+
+<h3 id="实验目标"><a href="#实验目标" class="headerlink" title="实验目标"></a>实验目标</h3><p>用编程语言实现以下算法：<br>1. 用 <strong>高斯 (Gauss) 消元法</strong> 求 n 阶线性方程组的解; <br>2. 用 <strong>列主元高斯 (Gauss) 消元法</strong> 求 n 阶线性方程组的解; <br>3. 用 <strong>列主元 LU 直接分解法</strong> 求 n 阶线性方程组的解; <br>4. 用 <strong>Jacobi 迭代法</strong> 求 n 阶线性方程组的解; <br>5. 用 <strong>Gauss-Seidel 迭代法</strong> 求 n 阶线性方程组的解。</p>
+<a id="more"></a>
+
+<h3 id="编程语言与扩展库"><a href="#编程语言与扩展库" class="headerlink" title="编程语言与扩展库"></a>编程语言与扩展库</h3><p>语言：<strong>Python 语言</strong> <br>扩展模块：<strong>numpy</strong></p>
+<h3 id="实现代码"><a href="#实现代码" class="headerlink" title="实现代码"></a>实现代码</h3><h4 id="高斯消元法-Gauss"><a href="#高斯消元法-Gauss" class="headerlink" title="高斯消元法 (Gauss)"></a>高斯消元法 (Gauss)</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入模块</span></span><br><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># 高斯消元法  求解 Ax=b</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Gauss</span>(<span class="params">A,b</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 获取A的行列</span></span><br><span class="line">    row = A.shape[<span class="number">0</span>]</span><br><span class="line">    column = A.shape[<span class="number">1</span>]</span><br><span class="line">    <span class="comment"># 非方阵情况</span></span><br><span class="line">    <span class="keyword">if</span> row != column:</span><br><span class="line">        print(<span class="string">&#x27;A不是方阵！&#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    n = row    <span class="comment"># 未知数数量</span></span><br><span class="line">    m = zeros((n,n))    <span class="comment"># m矩阵存储乘数</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 消元过程</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">0</span>,n<span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(k+<span class="number">1</span>,n):</span><br><span class="line">            <span class="comment"># 第i行除第k行得乘数</span></span><br><span class="line">            m[i,k] = A[i,k]/A[k,k]</span><br><span class="line">            <span class="comment"># 方程消元</span></span><br><span class="line">            A[i,:] = A[i,:] - m[i,k]*A[k,:]</span><br><span class="line">            b[i] = b[i] - m[i,k]*b[k]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 回代过程</span></span><br><span class="line">    x = transpose(zeros((<span class="number">1</span>,n)))</span><br><span class="line">    x[n<span class="number">-1</span>] = b[n<span class="number">-1</span>]/A[n<span class="number">-1</span>,n<span class="number">-1</span>]    <span class="comment"># Xn的值</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算Xn-1,Xn-2,...,X1的解</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">0</span>,n<span class="number">-1</span>)[::<span class="number">-1</span>]:    <span class="comment"># 第n-1行到第0行逆序</span></span><br><span class="line">        sum = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(k+<span class="number">1</span>,n):</span><br><span class="line">            sum += A[k,j]*x[j]</span><br><span class="line">        x[k] = (b[k]-sum)/A[k,k]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    A = array([[<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>],[<span class="number">0</span>,<span class="number">4</span>,<span class="number">-1</span>],[<span class="number">2</span>,<span class="number">-2</span>,<span class="number">1</span>]], dtype = double)</span><br><span class="line">    b = transpose(array([[<span class="number">6</span>,<span class="number">5</span>,<span class="number">1</span>]], dtype = double))</span><br><span class="line">    x = Gauss(A,b)</span><br><span class="line">    print(x)</span><br></pre></td></tr></table></figure>
+<h4 id="列主元高斯消元法（Gauss）"><a href="#列主元高斯消元法（Gauss）" class="headerlink" title="列主元高斯消元法（Gauss）"></a>列主元高斯消元法（Gauss）</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入模块</span></span><br><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># 列主元高斯消元法  求解Ax=b</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Gauss_column_pivoting</span>(<span class="params">A,b</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 获取A的行列</span></span><br><span class="line">    row = A.shape[<span class="number">0</span>]</span><br><span class="line">    column = A.shape[<span class="number">1</span>]</span><br><span class="line">    <span class="comment"># 非方阵情况</span></span><br><span class="line">    <span class="keyword">if</span> row != column:</span><br><span class="line">        print(<span class="string">&#x27;A不是方阵！&#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    n = row    <span class="comment"># 未知数数量</span></span><br><span class="line">    m = zeros((n, n))    <span class="comment"># m矩阵存储乘数</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">0</span>,n<span class="number">-1</span>):</span><br><span class="line">    <span class="comment"># 寻找最大主元的行数</span></span><br><span class="line">        h = argmax(abs(A[:,k]))</span><br><span class="line">        <span class="comment"># 交换行</span></span><br><span class="line">        <span class="keyword">if</span> k != h:</span><br><span class="line">            temp1 = copy(A[k,:])    <span class="comment"># copy产生该行的复制</span></span><br><span class="line">            A[k,:] = A[h,:]</span><br><span class="line">            A[h,:] = temp1</span><br><span class="line">            temp2 = copy(b[k])</span><br><span class="line">            b[k] = b[h]</span><br><span class="line">            b[h] = temp2</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 消元过程</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(k + <span class="number">1</span>, n):</span><br><span class="line">            <span class="comment"># 第i行除第k行得乘数</span></span><br><span class="line">            m[i, k] = A[i, k] / A[k, k]</span><br><span class="line">            <span class="comment"># 方程消元</span></span><br><span class="line">            A[i, :] = A[i, :] - m[i, k] * A[k, :]</span><br><span class="line">            b[i] = b[i] - m[i, k] * b[k]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 回代过程</span></span><br><span class="line">    x = transpose(zeros((<span class="number">1</span>, n)))    <span class="comment"># 构造x列向量</span></span><br><span class="line">    x[n - <span class="number">1</span>] = b[n - <span class="number">1</span>] / A[n - <span class="number">1</span>, n - <span class="number">1</span>]    <span class="comment"># Xn的值</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 计算Xn-1,Xn-2,...,X1的解</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">0</span>, n - <span class="number">1</span>)[::<span class="number">-1</span>]:  <span class="comment"># 第n-1行到第0行逆序</span></span><br><span class="line">        sum = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(k + <span class="number">1</span>, n):</span><br><span class="line">            sum += A[k, j] * x[j]</span><br><span class="line">        x[k] = (b[k] - sum) / A[k, k]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    A = array([[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], [<span class="number">0</span>, <span class="number">4</span>, <span class="number">-1</span>], [<span class="number">2</span>, <span class="number">-2</span>, <span class="number">1</span>]],  dtype = double)</span><br><span class="line">    b = transpose(array([[<span class="number">6</span>, <span class="number">5</span>, <span class="number">1</span>]], dtype = double))</span><br><span class="line">    x = Gauss_column_pivoting(A,b)</span><br><span class="line">    print(x)</span><br></pre></td></tr></table></figure>
+
+<h4 id="列主元-LU-直接分解法"><a href="#列主元-LU-直接分解法" class="headerlink" title="列主元 LU 直接分解法"></a>列主元 LU 直接分解法</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入模块</span></span><br><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># 列主元LU分解法  求解Ax=b</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">LU_column_pivoting</span>(<span class="params">A,b</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 获取A的行列</span></span><br><span class="line">    row = A.shape[<span class="number">0</span>]</span><br><span class="line">    column = A.shape[<span class="number">1</span>]</span><br><span class="line">    <span class="comment"># 非方阵情况</span></span><br><span class="line">    <span class="keyword">if</span> row != column:</span><br><span class="line">        print(<span class="string">&#x27;A不是方阵！&#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    n = row</span><br><span class="line">    Ip = list(range(n))    <span class="comment"># 标记主元交换次序</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> range(<span class="number">0</span>,n):</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 寻找最大主元的行数</span></span><br><span class="line">        h = argmax(abs(A[:,k]))</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 只能选择未交换的行进行交换</span></span><br><span class="line">        <span class="keyword">if</span> Ip[h] == h:</span><br><span class="line">             temp = copy(A[k, :])</span><br><span class="line">             A[k, :] = A[h, :]</span><br><span class="line">             A[h, :] = temp</span><br><span class="line">             Ip[k] = h</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 对角线减去对应行列乘积和</span></span><br><span class="line">        A[k,k] = A[k,k] - dot(A[k,<span class="number">0</span>:k], A[<span class="number">0</span>:k,k])</span><br><span class="line">        <span class="keyword">if</span> A[k,k] == <span class="number">0</span>:</span><br><span class="line">            print(<span class="string">&#x27;第&#123;&#125;个主元为0！&#x27;</span>.format(k+<span class="number">1</span>))</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 直接在A上保存L和U</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(k+<span class="number">1</span>,n):    <span class="comment"># j&gt;k</span></span><br><span class="line">            A[k,j] = A[k,j] - dot(A[k,<span class="number">0</span>:k], A[<span class="number">0</span>:k,j])</span><br><span class="line">            A[j,k] = (A[j,k] - dot(A[j,<span class="number">0</span>:k], A[<span class="number">0</span>:k,k])) / A[k,k]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 单位下三角L和上三角U</span></span><br><span class="line">    L = tril(A,<span class="number">-1</span>) + identity((n))</span><br><span class="line">    U = triu(A,<span class="number">0</span>)</span><br><span class="line">    L.dtype = double</span><br><span class="line">    U.dtype = double</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 交换b对应行</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,n):</span><br><span class="line">        t = Ip[i]</span><br><span class="line">        <span class="keyword">if</span> t != i:</span><br><span class="line">            temp = copy(b[i])</span><br><span class="line">            b[i] = b[t]</span><br><span class="line">            b[t] = temp</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 求解Ly=b</span></span><br><span class="line">    y = transpose(array([arange(n)], dtype = double))</span><br><span class="line">    y[<span class="number">0</span>] = b[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,n):</span><br><span class="line">        sum = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> range(<span class="number">0</span>,i):</span><br><span class="line">            sum += L[i,t]*y[t]</span><br><span class="line">        y[i] = b[i] - sum</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 求解Ux=y</span></span><br><span class="line">    x = transpose(array([arange(n)],dtype = double))</span><br><span class="line">    x[n<span class="number">-1</span>] = y[n<span class="number">-1</span>]/U[n<span class="number">-1</span>,n<span class="number">-1</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,n<span class="number">-1</span>)[::<span class="number">-1</span>]:</span><br><span class="line">        sum = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> range(i+<span class="number">1</span>,n):</span><br><span class="line">            sum +=  U[i,t]*x[t]</span><br><span class="line">        x[i] = (y[i]-sum)/U[i,i]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    A = array([[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>],[<span class="number">2</span>,<span class="number">5</span>,<span class="number">2</span>],[<span class="number">3</span>,<span class="number">1</span>,<span class="number">5</span>]], dtype = double)</span><br><span class="line">    b = transpose(array([[<span class="number">14</span>,<span class="number">18</span>,<span class="number">20</span>]], dtype = double))</span><br><span class="line">    x = LU_column_pivoting(A,b)</span><br><span class="line">    print(x)</span><br></pre></td></tr></table></figure>
+
+<h4 id="Jacobi-迭代法"><a href="#Jacobi-迭代法" class="headerlink" title="Jacobi 迭代法"></a>Jacobi 迭代法</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入模块</span></span><br><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始解向量，迭代上限，误差范围</span></span><br><span class="line">x_start = array([[<span class="number">0</span>],[<span class="number">0</span>],[<span class="number">0</span>]])</span><br><span class="line">N = <span class="number">100</span></span><br><span class="line">tol = <span class="number">1e-7</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Jacobi迭代</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Jacobi</span>(<span class="params">A,b</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 获取A的行列</span></span><br><span class="line">    row = A.shape[<span class="number">0</span>]</span><br><span class="line">    column = A.shape[<span class="number">1</span>]</span><br><span class="line">    <span class="comment"># 非方阵情况</span></span><br><span class="line">    <span class="keyword">if</span> row != column:</span><br><span class="line">        print(<span class="string">&#x27;A不是方阵！&#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    n = row</span><br><span class="line">    x_k = x_start</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 删去A的对角线</span></span><br><span class="line">    A_ = copy(A)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">        A_[i,i] = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 迭代求解</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line"></span><br><span class="line">        t = transpose([diag(A)])</span><br><span class="line">        x_k_plus = (b - dot(A_, x_k))/t</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 达到足够小的误差</span></span><br><span class="line">        <span class="keyword">if</span> (max(abs((x_k - x_k_plus)[:,<span class="number">0</span>])) &lt; tol):</span><br><span class="line">            print(<span class="string">&#x27;迭代次数: &#123;&#125;&#x27;</span>.format(i+<span class="number">1</span>))</span><br><span class="line">            print(<span class="string">&#x27;方程组解: &#x27;</span>)</span><br><span class="line">            print(x_k_plus)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        x_k = x_k_plus</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>  i == N:</span><br><span class="line">        print(<span class="string">&#x27;错误！不收敛！&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    A = array([[<span class="number">8</span>,<span class="number">-3</span>,<span class="number">2</span>],[<span class="number">4</span>,<span class="number">11</span>,<span class="number">-1</span>],[<span class="number">6</span>,<span class="number">3</span>,<span class="number">12</span>]], dtype = double)</span><br><span class="line">    b = transpose(array([[<span class="number">20</span>,<span class="number">33</span>,<span class="number">36</span>]], dtype = double))</span><br><span class="line">    Jacobi(A,b)</span><br></pre></td></tr></table></figure>
+
+<h4 id="Gauss-Seidel-迭代法"><a href="#Gauss-Seidel-迭代法" class="headerlink" title="Gauss-Seidel 迭代法"></a>Gauss-Seidel 迭代法</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入模块</span></span><br><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始解向量，迭代上限，误差范围</span></span><br><span class="line">x_start = array([[<span class="number">1</span>],[<span class="number">2</span>],[<span class="number">3</span>]])</span><br><span class="line">N = <span class="number">1000</span></span><br><span class="line">tol = <span class="number">1e-10</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># GS迭代法  求解Ax=b</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Gauss_Seidel</span>(<span class="params">A,b</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 获取A的行列</span></span><br><span class="line">    row = A.shape[<span class="number">0</span>]</span><br><span class="line">    column = A.shape[<span class="number">1</span>]</span><br><span class="line">    <span class="comment"># 非方阵情况</span></span><br><span class="line">    <span class="keyword">if</span> row != column:</span><br><span class="line">        print(<span class="string">&#x27;A不是方阵！&#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 初值</span></span><br><span class="line">    n = row</span><br><span class="line">    x_k = x_start</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 构造DLU</span></span><br><span class="line">    U = copy(A)     <span class="comment"># U</span></span><br><span class="line">    DL = copy(A)    <span class="comment"># D-L</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(n):</span><br><span class="line">            <span class="keyword">if</span> j&lt;=i:</span><br><span class="line">                U[i,j] = <span class="number">0</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                DL[i,j] = <span class="number">0</span></span><br><span class="line">    U = <span class="number">0</span>-U</span><br><span class="line"></span><br><span class="line">    <span class="comment"># DL逆与U, b相乘</span></span><br><span class="line">    DL_U = dot(linalg.inv(DL),U)</span><br><span class="line">    DL_b = dot(linalg.inv(DL),b)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 迭代求解</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(N):</span><br><span class="line">        x_k_plus = dot(DL_U,x_k) + DL_b</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 达到误差要求</span></span><br><span class="line">        <span class="keyword">if</span> max(abs((x_k_plus - x_k)[:,<span class="number">0</span>])) &lt; tol:</span><br><span class="line">            print(<span class="string">&#x27;方程组解: &#x27;</span>)</span><br><span class="line">            print(x_k_plus)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        x_k = x_k_plus</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> i == N:</span><br><span class="line">        print(<span class="string">&#x27;错误！不收敛！&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    A = array([[<span class="number">8</span>, <span class="number">-3</span>, <span class="number">2</span>], [<span class="number">4</span>, <span class="number">11</span>, <span class="number">-1</span>], [<span class="number">6</span>, <span class="number">3</span>, <span class="number">12</span>]], dtype=double)</span><br><span class="line">    b = transpose(array([[<span class="number">20</span>, <span class="number">33</span>, <span class="number">36</span>]], dtype=double))</span><br><span class="line">    Gauss_Seidel(A,b)</span><br></pre></td></tr></table></figure>
+
+<h3 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h3><p>声明：本专栏内容来源于武汉理工大学 2019-2020 学年数值分析方法课程实验，<strong>仅供学习参考</strong>。<br>如有错误或不足地方，还请指出，祝愿读者能够在编程之路上不断进步！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Kingzy
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://kingzy-chen.github.io/2020/10/17/Numerical-Analysis-03/" title="【数值分析课程实验-03】线性代数方程组的数值解法">http://kingzy-chen.github.io/2020/10/17/Numerical-Analysis-03/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90/" rel="tag"># 数值分析</a>
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/%E9%AB%98%E6%96%AF%E6%B6%88%E5%85%83%E6%B3%95/" rel="tag"># 高斯消元法</a>
+              <a href="/tags/Jacobi-%E8%BF%AD%E4%BB%A3%E6%B3%95/" rel="tag"># Jacobi 迭代法</a>
+              <a href="/tags/Gauss-Seidei-%E8%BF%AD%E4%BB%A3%E6%B3%95/" rel="tag"># Gauss-Seidei 迭代法</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/10/13/Numerical-Analysis-02/" rel="prev" title="【数值分析课程实验-02】数值积分与微分">
+                  <i class="fa fa-chevron-left"></i> 【数值分析课程实验-02】数值积分与微分
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+  
+  
+  
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kingzy</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.0/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
