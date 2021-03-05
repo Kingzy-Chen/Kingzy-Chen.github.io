@@ -25,7 +25,7 @@
   <meta name="description" content="Fake it till you Make it.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Kingzy&#39;s Blog">
-<meta property="og:url" content="http://kingzy-chen.github.io/archives/2020/index.html">
+<meta property="og:url" content="http://kingzy-chen.github.io/archives/2021/03/index.html">
 <meta property="og:site_name" content="Kingzy&#39;s Blog">
 <meta property="og:description" content="Fake it till you Make it.">
 <meta property="og:locale" content="zh_CN">
@@ -33,7 +33,7 @@
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://kingzy-chen.github.io/archives/2020/">
+<link rel="canonical" href="http://kingzy-chen.github.io/archives/2021/03/">
 
 
 <script class="page-configurations">
@@ -268,21 +268,21 @@
 
       
     <div class="collection-year">
-      <span class="collection-header">2020</span>
+      <span class="collection-header">2021</span>
     </div>
 
   <article itemscope itemtype="http://schema.org/Article">
     <header class="post-header">
       <div class="post-meta-container">
         <time itemprop="dateCreated"
-              datetime="2020-10-19T11:50:18+08:00"
-              content="2020-10-19">
-          10-19
+              datetime="2021-03-05T16:00:16+08:00"
+              content="2021-03-05">
+          03-05
         </time>
       </div>
 
       <div class="post-title">
-          <a class="post-title-link" href="/2020/10/19/Numerical-Analysis-04/" itemprop="url">
+          <a class="post-title-link" href="/2021/03/05/Numerical-Analysis-04/" itemprop="url">
             <span itemprop="name">【数值分析课程实验-04】方程求根的数值方法</span>
           </a>
       </div>
@@ -295,14 +295,14 @@
     <header class="post-header">
       <div class="post-meta-container">
         <time itemprop="dateCreated"
-              datetime="2020-10-17T12:09:03+08:00"
-              content="2020-10-17">
-          10-17
+              datetime="2021-03-05T15:47:15+08:00"
+              content="2021-03-05">
+          03-05
         </time>
       </div>
 
       <div class="post-title">
-          <a class="post-title-link" href="/2020/10/17/Numerical-Analysis-03/" itemprop="url">
+          <a class="post-title-link" href="/2021/03/05/Numerical-Analysis-03/" itemprop="url">
             <span itemprop="name">【数值分析课程实验-03】线性代数方程组的数值解法</span>
           </a>
       </div>
@@ -315,14 +315,14 @@
     <header class="post-header">
       <div class="post-meta-container">
         <time itemprop="dateCreated"
-              datetime="2020-10-13T23:19:08+08:00"
-              content="2020-10-13">
-          10-13
+              datetime="2021-03-05T15:23:15+08:00"
+              content="2021-03-05">
+          03-05
         </time>
       </div>
 
       <div class="post-title">
-          <a class="post-title-link" href="/2020/10/13/Numerical-Analysis-02/" itemprop="url">
+          <a class="post-title-link" href="/2021/03/05/Numerical-Analysis-02/" itemprop="url">
             <span itemprop="name">【数值分析课程实验-02】数值积分与微分</span>
           </a>
       </div>
@@ -335,14 +335,14 @@
     <header class="post-header">
       <div class="post-meta-container">
         <time itemprop="dateCreated"
-              datetime="2020-10-10T15:20:23+08:00"
-              content="2020-10-10">
-          10-10
+              datetime="2021-03-05T14:45:09+08:00"
+              content="2021-03-05">
+          03-05
         </time>
       </div>
 
       <div class="post-title">
-          <a class="post-title-link" href="/2020/10/10/Numerical-Analysis-01/" itemprop="url">
+          <a class="post-title-link" href="/2021/03/05/Numerical-Analysis-01/" itemprop="url">
             <span itemprop="name">【数值分析课程实验-01】插值方法</span>
           </a>
       </div>
@@ -448,12 +448,58 @@
   
 
   
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = '//cdn.jsdelivr.net/npm/mathjax@3.1.0/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
 <script>
 NexT.utils.loadComments('#valine-comments', () => {
   NexT.utils.getScript('//cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', () => {
     new Valine(Object.assign({
       el  : '#valine-comments',
-      path: "/archives/2020/",
+      path: "/archives/2021/03/",
     }, {"enable":true,"appId":"ghtDwi2TvSzmYReME6u3GiBz-gzGzoHsz","appKey":"ABDAuS7ynahYeX3BDqcES2WY","placeholder":"ヾﾉ≧∀≦)o来啊, 快活啊!","avatar":"mm","meta":["nick","mail","link"],"pageSize":8,"lang":null,"visitor":false,"comment_count":true,"recordIP":false,"serverURLs":null,"enableQQ":false,"requiredFields":[]}
     ));
   }, window.Valine);

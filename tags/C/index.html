@@ -270,21 +270,21 @@
 
       
     <div class="collection-year">
-      <span class="collection-header">2020</span>
+      <span class="collection-header">2021</span>
     </div>
 
   <article itemscope itemtype="http://schema.org/Article">
     <header class="post-header">
       <div class="post-meta-container">
         <time itemprop="dateCreated"
-              datetime="2020-10-13T23:19:08+08:00"
-              content="2020-10-13">
-          10-13
+              datetime="2021-03-05T15:23:15+08:00"
+              content="2021-03-05">
+          03-05
         </time>
       </div>
 
       <div class="post-title">
-          <a class="post-title-link" href="/2020/10/13/Numerical-Analysis-02/" itemprop="url">
+          <a class="post-title-link" href="/2021/03/05/Numerical-Analysis-02/" itemprop="url">
             <span itemprop="name">【数值分析课程实验-02】数值积分与微分</span>
           </a>
       </div>
@@ -297,14 +297,14 @@
     <header class="post-header">
       <div class="post-meta-container">
         <time itemprop="dateCreated"
-              datetime="2020-10-10T15:20:23+08:00"
-              content="2020-10-10">
-          10-10
+              datetime="2021-03-05T14:45:09+08:00"
+              content="2021-03-05">
+          03-05
         </time>
       </div>
 
       <div class="post-title">
-          <a class="post-title-link" href="/2020/10/10/Numerical-Analysis-01/" itemprop="url">
+          <a class="post-title-link" href="/2021/03/05/Numerical-Analysis-01/" itemprop="url">
             <span itemprop="name">【数值分析课程实验-01】插值方法</span>
           </a>
       </div>
@@ -407,6 +407,52 @@
 
 
   
+
+  
+      <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = '//cdn.jsdelivr.net/npm/mathjax@3.1.0/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 <script>
